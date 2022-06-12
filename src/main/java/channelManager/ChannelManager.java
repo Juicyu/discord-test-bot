@@ -1,15 +1,10 @@
 package channelManager;
 
-import org.javacord.api.entity.channel.VoiceChannel;
-import org.javacord.api.entity.message.MessageAuthor;
-import org.javacord.api.entity.server.Server;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
-import org.javacord.api.interaction.MessageComponentInteraction;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 public class ChannelManager {
 
@@ -44,13 +39,12 @@ public class ChannelManager {
         }
     }
 
-/*    public void muteAll(MessageComponentInteraction interaction, Server server) {
-        if (interaction.getUser().getConnectedVoiceChannel(server).isPresent()) {
-            Collection<User> connectedUser = interaction.getUser().getConnectedVoiceChannel(server).get().getConnectedUsers();
-            for (User user :
-                    connectedUser) {
-                user.mute(server);
-            }
+    public void deleteMessages(MessageCreateEvent event, String content){
+        int messageCount = 0;
+        try{
+            messageCount = Integer.parseInt(content);
+            event.getChannel().getMessages(++messageCount).get().deleteAll();
+        } catch (Exception ignored){
         }
-    }*/
+    }
 }
