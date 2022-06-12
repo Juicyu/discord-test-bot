@@ -7,10 +7,10 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class PollBuilder {
+public final class PollBuilder {
 
-    private static ArrayList<String> numberEmojis = new ArrayList<>();
-    private static ArrayList<String> numberReactions = new ArrayList<>();
+    private static final ArrayList<String> numberEmojis = new ArrayList<>();
+    private static final ArrayList<String> numberReactions = new ArrayList<>();
 
     public PollBuilder() {
         numberEmojis.add(":zero: ");

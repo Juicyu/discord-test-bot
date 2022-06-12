@@ -13,10 +13,6 @@ public class MainProgramm {
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
         System.out.println("Invite the Bot using following link: " + api.createBotInvite());
 
-        //Erstellen der Module
-        PollBuilder pollBuilder = new PollBuilder();
-        ChannelManager channelManager = new ChannelManager();
-
         api.addMessageCreateListener(event -> {
             String command = event.getMessageContent().split("\s")[0];
             String content = "0";
@@ -26,11 +22,11 @@ public class MainProgramm {
             }
 
             switch (command){
-                case ("!poll") -> pollBuilder.createPoll(event);
+                case ("!poll") -> PollBuilder.createPoll(event);
                 case ("!Hallo") -> event.getChannel().sendMessage("Hi! " + event.getMessageAuthor().getDisplayName());
-                case ("!muteAll") -> channelManager.muteAll(event);
-                case ("!unmuteAll") -> channelManager.unmuteAll(event);
-                case ("!del") -> channelManager.deleteMessages(event, content);
+                case ("!muteAll") -> ChannelManager.muteAll(event);
+                case ("!unmuteAll") -> ChannelManager.unmuteAll(event);
+                case ("!del") -> ChannelManager.deleteMessages(event, content);
             }
         });
     }
