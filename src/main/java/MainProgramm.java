@@ -1,3 +1,4 @@
+import channelManager.ChannelManager;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import poll.PollBuilder;
@@ -14,15 +15,16 @@ public class MainProgramm {
 
         //Erstellen der Module
         PollBuilder pollBuilder = new PollBuilder();
+        ChannelManager channelManager = new ChannelManager();
 
         api.addMessageCreateListener(event -> {
             String command = event.getMessageContent().split("\s")[0];
-            System.out.println(command);
-
 
             switch (command){
                 case ("!poll") -> pollBuilder.createPoll(event);
-                case ("!Hallo") -> event.getChannel().sendMessage("Hi! ");
+                case ("!Hallo") -> event.getChannel().sendMessage("Hi! " + event.getMessageAuthor().getDisplayName());
+                case ("!muteAll") -> channelManager.muteAll(event);
+                case ("!unmuteAll") -> channelManager.unmuteAll(event);
             }
         });
     }
