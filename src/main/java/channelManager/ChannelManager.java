@@ -1,10 +1,14 @@
 package channelManager;
 
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.channel.ServerVoiceChannelBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.server.ServerChannelChangeNameEvent;
 import org.javacord.api.event.channel.server.ServerChannelCreateEvent;
 import org.javacord.api.event.message.MessageCreateEvent;
+import org.javacord.api.listener.channel.server.voice.ServerVoiceChannelMemberJoinListener;
+import org.javacord.api.util.event.ListenerManager;
 
 import java.util.Collection;
 
@@ -38,7 +42,7 @@ public class ChannelManager {
             event.getMessage().delete();
         }
     }
-
+    //Befehl zum Löschen von x Nachrichten
     public static void deleteMessages(MessageCreateEvent event, String content){
         int messageCount;
         try{
@@ -48,23 +52,55 @@ public class ChannelManager {
         }
     }
 
+    //Aufruf der Methode zur Erstellung eines Channel+, wenn ein Channel mit einem "+" am Ende des Namens erstellt wurde
     public static void channelPlusEvent(ServerChannelCreateEvent event){
         if(event.getChannel().asServerVoiceChannel().isPresent()){
             createChannelPlus((event.getChannel().asServerVoiceChannel().get()));
         }
     }
 
+    //Aufruf der Methode zur Erstellung eines Channel+, wenn ein Channelname mit einem + am Ende versehen wurde
     public static void channelRenameEvent(ServerChannelChangeNameEvent event){
         if(event.getChannel().asServerVoiceChannel().isPresent()){
             createChannelPlus((event.getChannel().asServerVoiceChannel().get()));
         }
     }
 
-    private static void createChannelPlus(ServerVoiceChannel channel){
+    //Methode zum Erstellen eines neuen Channel+
+    public static void createChannelPlus(ServerVoiceChannel channel){
 
+        //prüfen, ob es ein Channel+ ist
         if(channel.getName().endsWith("+")){
             if(channel.asServerVoiceChannel().isPresent()){
+                //Channel konfigurieren
                 channel.updateUserLimit(1);
+                ListenerManager<ServerVoiceChannelMemberJoinListener> listener =
+                channel.addServerVoiceChannelMemberJoinListener(event -> {
+                    ServerVoiceChannel newChannel = new ServerVoiceChannelBuilder(event.getServer())
+                            .setName("Channel von " + event.getUser().getName())
+                            .create()
+                            .join();
+
+                    //falls Channel+ in einer Kategorie ist, neue Channel ebenfalls in dieser Kategorie anlegen
+                    if(event.getChannel().getCategory().isPresent()){
+                        newChannel.updateCategory(event.getChannel().getCategory().get());
+                    }
+                    event.getUser().move(newChannel);
+
+                    //Channeluser < 1, dann Channel entfernen
+                    newChannel.addServerVoiceChannelMemberLeaveListener(leaveEvent -> {
+                        if(leaveEvent.getChannel().getConnectedUserIds().size() < 1){
+                            newChannel.delete();
+                        }
+                    });
+                });
+
+                channel.addServerChannelChangeNameListener(changeNameEvent -> {
+                    if(!changeNameEvent.getChannel().getName().endsWith("+")){
+                        channel.updateUserLimit(0);
+                        listener.remove();
+                    }
+                });
             }
         }
     }
