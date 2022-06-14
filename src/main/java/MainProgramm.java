@@ -29,5 +29,9 @@ public class MainProgramm {
                 case ("!del") -> ChannelManager.deleteMessages(event, content);
             }
         });
+
+        //automatisierte Erstellung von Channel+ durch Channelerstellung und Channel Umbenennung
+        api.addServerChannelCreateListener(ChannelManager::channelPlusEvent);
+        api.addServerChannelChangeNameListener(ChannelManager::channelRenameEvent);
     }
 }

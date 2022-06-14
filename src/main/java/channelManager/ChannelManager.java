@@ -1,6 +1,9 @@
 package channelManager;
 
+import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.event.channel.server.ServerChannelChangeNameEvent;
+import org.javacord.api.event.channel.server.ServerChannelCreateEvent;
 import org.javacord.api.event.message.MessageCreateEvent;
 
 import java.util.Collection;
@@ -42,6 +45,27 @@ public class ChannelManager {
             messageCount = Integer.parseInt(content);
             event.getChannel().getMessages(++messageCount).get().deleteAll();
         } catch (Exception ignored){
+        }
+    }
+
+    public static void channelPlusEvent(ServerChannelCreateEvent event){
+        if(event.getChannel().asServerVoiceChannel().isPresent()){
+            createChannelPlus((event.getChannel().asServerVoiceChannel().get()));
+        }
+    }
+
+    public static void channelRenameEvent(ServerChannelChangeNameEvent event){
+        if(event.getChannel().asServerVoiceChannel().isPresent()){
+            createChannelPlus((event.getChannel().asServerVoiceChannel().get()));
+        }
+    }
+
+    private static void createChannelPlus(ServerVoiceChannel channel){
+
+        if(channel.getName().endsWith("+")){
+            if(channel.asServerVoiceChannel().isPresent()){
+                channel.updateUserLimit(1);
+            }
         }
     }
 }
