@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 public final class PollBuilder {
 
-    private static final ArrayList<String> numberEmojis = new ArrayList<>();
-    private static final ArrayList<String> numberReactions = new ArrayList<>();
+    private final ArrayList<String> numberEmojis = new ArrayList<>();
+    private final ArrayList<String> numberReactions = new ArrayList<>();
 
     public PollBuilder() {
         numberEmojis.add(":zero: ");
@@ -38,7 +38,7 @@ public final class PollBuilder {
         numberReactions.add("\uD83D\uDD1F");
     }
 
-    public static void createPoll(MessageCreateEvent event) {
+    public void createPoll(MessageCreateEvent event) {
 
         //Frage von den Antworten trennen und speichern
         String poll = event.getMessageContent().split("!poll ")[1];

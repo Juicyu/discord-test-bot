@@ -14,12 +14,13 @@ public class PropertiesReader {
         InputStream inputStream = cl.getResourceAsStream("token.properties");
         try {
             properties.load(inputStream);
+            assert inputStream != null;
             inputStream.close();
         } catch (IOException exception) {
 
         }
     }
-    public static final String getProperty(String propertyName){
+    public static String getProperty(String propertyName){
         return properties.getProperty(propertyName);
     }
 }

@@ -1,10 +1,10 @@
+import audioplayer.BotPlayer;
 import channelManager.ChannelManager;
+import general.General;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
-import org.javacord.api.entity.server.Server;
-import org.javacord.api.event.channel.server.ServerChannelCreateEvent;
 import poll.PollBuilder;
 import properties.PropertiesReader;
 
@@ -19,21 +19,29 @@ public class MainProgramm {
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
         System.out.println("Invite the Bot using following link: " + api.createBotInvite());
 
+        //Erstelle Instanzen der Hilfsklassen
+        ChannelManager channelManager = new ChannelManager();
+        PollBuilder pollBuilder = new PollBuilder();
+        General general = new General();
+        BotPlayer botPlayer = new BotPlayer();
+
         //Erstellung der Befehlsliste für den Bot und Aufruf der entsprechenden Methoden
         api.addMessageCreateListener(event -> {
             String command = event.getMessageContent().split("\s")[0];
             String content = "0";
 
-            if (event.getMessageContent().startsWith("!del")) {
+            if (event.getMessageContent().startsWith("!del") || event.getMessageContent().startsWith("!play")) {
                 content = event.getMessageContent().split("\s")[1];
             }
 
             switch (command) {
-                case ("!poll") -> PollBuilder.createPoll(event);
-                case ("!Hallo") -> event.getChannel().sendMessage("Hi! " + event.getMessageAuthor().getDisplayName());
-                case ("!muteAll") -> ChannelManager.muteAll(event);
-                case ("!unmuteAll") -> ChannelManager.unmuteAll(event);
-                case ("!del") -> ChannelManager.deleteMessages(event, content);
+                case ("!poll") -> pollBuilder.createPoll(event);
+                case ("!Hallo") -> general.sagHallo(event);
+                case ("!muteAll") -> channelManager.muteAll(event);
+                case ("!unmuteAll") -> channelManager.unmuteAll(event);
+                case ("!del") -> channelManager.deleteMessages(event, content);
+                case ("!Anleitung") -> general.zeigeAnleitung(event);
+                case ("!play") -> botPlayer.play(api, event, content);
             }
         });
 
@@ -41,12 +49,12 @@ public class MainProgramm {
         Collection<ServerChannel> channels = api.getServerChannels();
         for (ServerChannel channel : channels) {
             if (channel.getName().endsWith("+")) {
-                ChannelManager.createChannelPlus((ServerVoiceChannel) channel);
+                channelManager.createChannelPlus((ServerVoiceChannel) channel);
             }
         }
 
         //automatisierte Erstellung von Channel+ durch Channelerstellung und Channel Umbenennung
-        api.addServerChannelCreateListener(ChannelManager::channelPlusEvent);
-        api.addServerChannelChangeNameListener(ChannelManager::channelRenameEvent);
+        api.addServerChannelCreateListener(channelManager::channelPlusEvent);
+        api.addServerChannelChangeNameListener(channelManager::channelRenameEvent);
     }
 }
