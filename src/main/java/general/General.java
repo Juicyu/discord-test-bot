@@ -10,7 +10,6 @@ public class General {
         - **!Hallo** (Bottas wird dich zurück grüßen!)
         - **!poll Frage? Antwort! Antwort! ...** So kann eine Umfrage gestartet werden. Es können bis zu 10 Antworten angegeben werden.
                 Beispiel: !poll Ist der Bot nicht geil? Ja! Juicy ist geiler! Ich mag Züge!
-        - **!add Buttons** (Fügt ein Panel mit 2 Buttons hinzu, um alle Channelteilnehmer zu muten/entmuten)
         - **!del x** (löscht die letzten x Nachrichten eines Channels. Für "x" kann eine beliebige Zahl eingesetzt werden.)
         - **!mute** (mutet alle Teilnehmer des Voicechannels, in dem sich der Autor des Befehls befindet)
         - **!unmute** (unmutet alle Teilnehmer des Voicechannels, in dem sich der Autor des Befehls befindet)

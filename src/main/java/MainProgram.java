@@ -10,13 +10,14 @@ import properties.PropertiesReader;
 
 import java.util.Collection;
 
-public class MainProgramm {
+public class MainProgram {
 
     public static void main(String[] args) {
 
         //Erstellen der Verbindung
         String token = PropertiesReader.getProperty("token");
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
+        //All permissions: 1099511627775
         System.out.println("Invite the Bot using following link: " + api.createBotInvite());
 
         //Erstelle Instanzen der Hilfsklassen
@@ -27,7 +28,7 @@ public class MainProgramm {
 
         //Erstellung der Befehlsliste für den Bot und Aufruf der entsprechenden Methoden
         api.addMessageCreateListener(event -> {
-            String command = event.getMessageContent().split("\s")[0];
+            String command = event.getMessageContent().split("\s")[0].toLowerCase();
             String content = "0";
 
             if (event.getMessageContent().startsWith("!del") || event.getMessageContent().startsWith("!play")) {
@@ -36,11 +37,11 @@ public class MainProgramm {
 
             switch (command) {
                 case ("!poll") -> pollBuilder.createPoll(event);
-                case ("!Hallo") -> general.sagHallo(event);
-                case ("!muteAll") -> channelManager.muteAll(event);
-                case ("!unmuteAll") -> channelManager.unmuteAll(event);
+                case ("!hallo") -> general.sagHallo(event);
+                case ("!muteall") -> channelManager.muteAll(event);
+                case ("!unmuteall") -> channelManager.unmuteAll(event);
                 case ("!del") -> channelManager.deleteMessages(event, content);
-                case ("!Anleitung") -> general.zeigeAnleitung(event);
+                case ("!anleitung") -> general.zeigeAnleitung(event);
                 case ("!play") -> botPlayer.play(api, event, content);
             }
         });

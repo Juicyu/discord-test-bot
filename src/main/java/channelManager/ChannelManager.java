@@ -1,5 +1,6 @@
 package channelManager;
 
+import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannelBuilder;
 import org.javacord.api.entity.user.User;
@@ -52,6 +53,7 @@ public class ChannelManager {
     }
 
     //Aufruf der Methode zur Erstellung eines Channel+, wenn ein Channel mit einem "+" am Ende des Namens erstellt wurde
+    //Neuer Channel!
     public void channelPlusEvent(ServerChannelCreateEvent event){
         if(event.getChannel().asServerVoiceChannel().isPresent()){
             createChannelPlus((event.getChannel().asServerVoiceChannel().get()));
@@ -59,6 +61,7 @@ public class ChannelManager {
     }
 
     //Aufruf der Methode zur Erstellung eines Channel+, wenn ein Channelname mit einem + am Ende versehen wurde
+    //Rename!
     public void channelRenameEvent(ServerChannelChangeNameEvent event){
         if(event.getChannel().asServerVoiceChannel().isPresent()){
             createChannelPlus((event.getChannel().asServerVoiceChannel().get()));
@@ -76,7 +79,7 @@ public class ChannelManager {
                 ListenerManager<ServerVoiceChannelMemberJoinListener> listener =
                 channel.addServerVoiceChannelMemberJoinListener(event -> {
                     ServerVoiceChannel newChannel = new ServerVoiceChannelBuilder(event.getServer())
-                            .setName("Channel von " + event.getUser().getName())
+                            .setName(event.getChannel().getName().replace("+", ""))
                             .create()
                             .join();
 
