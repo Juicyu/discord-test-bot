@@ -3,6 +3,7 @@ package channelManager;
 import org.javacord.api.entity.channel.ChannelCategory;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannelBuilder;
+import org.javacord.api.entity.server.BoostLevel;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.server.ServerChannelChangeNameEvent;
 import org.javacord.api.event.channel.server.ServerChannelCreateEvent;
@@ -81,14 +82,17 @@ public class ChannelManager {
                     ServerVoiceChannel newChannel = new ServerVoiceChannelBuilder(event.getServer())
                             .setName(event.getChannel().getName().replace("+", ""))
                             .setCategory(event.getChannel().getCategory().get())
-                            .setBitrate(128000)
                             .create()
                             .join();
 
-                    //falls Channel+ in einer Kategorie ist, neue Channel ebenfalls in dieser Kategorie anlegen
-/*                    if(event.getChannel().getCategory().isPresent()){
-                        newChannel.updateCategory(event.getChannel().getCategory().get());
-                    }*/
+                    //Setzt die Bitrate eines Servervoice Chanels abhängig von der Tier Stufe des Servers
+                    switch (event.getServer().getBoostLevel()){
+                        case NONE -> newChannel.updateBitrate(96000);
+                        case TIER_1 -> newChannel.updateBitrate(128000);
+                        case TIER_2 -> newChannel.updateBitrate(256000);
+                        case TIER_3 -> newChannel.updateBitrate(384000);
+                    }
+
                     event.getUser().move(newChannel);
 
                     //Channeluser < 1, dann Channel entfernen
