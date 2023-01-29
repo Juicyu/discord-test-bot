@@ -80,13 +80,15 @@ public class ChannelManager {
                 channel.addServerVoiceChannelMemberJoinListener(event -> {
                     ServerVoiceChannel newChannel = new ServerVoiceChannelBuilder(event.getServer())
                             .setName(event.getChannel().getName().replace("+", ""))
+                            .setCategory(event.getChannel().getCategory().get())
+                            .setBitrate(128000)
                             .create()
                             .join();
 
                     //falls Channel+ in einer Kategorie ist, neue Channel ebenfalls in dieser Kategorie anlegen
-                    if(event.getChannel().getCategory().isPresent()){
+/*                    if(event.getChannel().getCategory().isPresent()){
                         newChannel.updateCategory(event.getChannel().getCategory().get());
-                    }
+                    }*/
                     event.getUser().move(newChannel);
 
                     //Channeluser < 1, dann Channel entfernen
