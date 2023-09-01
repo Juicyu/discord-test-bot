@@ -5,6 +5,7 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
+import org.javacord.api.entity.intent.Intent;
 import poll.PollBuilder;
 import properties.PropertiesReader;
 
@@ -16,7 +17,11 @@ public class MainProgram {
 
         //Erstellen der Verbindung
         String token = PropertiesReader.getProperty("token");
-        DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
+        DiscordApi api = new DiscordApiBuilder()
+                .setToken(token)
+                .addIntents(Intent.MESSAGE_CONTENT)
+                .login()
+                .join();
         //All permissions: 1099511627775
         System.out.println("Invite the Bot using following link: " + api.createBotInvite());
 
@@ -35,15 +40,21 @@ public class MainProgram {
                 content = event.getMessageContent().split("\s")[1];
             }
 
-            switch (command) {
-                case ("!poll") -> pollBuilder.createPoll(event);
-                case ("!hallo") -> general.sagHallo(event);
-                case ("!muteall") -> channelManager.muteAll(event);
-                case ("!unmuteall") -> channelManager.unmuteAll(event);
-                case ("!del") -> channelManager.deleteMessages(event, content);
-                case ("!anleitung") -> general.zeigeAnleitung(event);
-                case ("!play") -> botPlayer.play(api, event, content);
+            try{
+                switch (command) {
+                    case ("!poll") -> pollBuilder.createPoll(event);
+                    case ("!hallo") -> general.sagHallo(event);
+                    case ("!muteall") -> channelManager.muteAll(event);
+                    case ("!unmuteall") -> channelManager.unmuteAll(event);
+                    case ("!del") -> channelManager.deleteMessages(event, content);
+                    case ("!anleitung") -> general.zeigeAnleitung(event);
+                    case ("!play") -> botPlayer.play(api, event, content);
+                    case ("!shutdown") -> general.shutdown(event);
+                }
+            } catch(Error e) {
+                System.out.println(e.getMessage());
             }
+
         });
 
         //Fragt beim Bot-Start alle Channel ab, ob Sie Channel+ sind und fügt Channel+ - Funktionalität hinzu

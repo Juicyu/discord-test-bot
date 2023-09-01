@@ -31,4 +31,11 @@ public class General {
     public void sagHallo(MessageCreateEvent event){
         event.getChannel().sendMessage("Hallo " + event.getMessageAuthor().getDisplayName());
     }
+
+    public void shutdown(MessageCreateEvent event){
+        long creatorID = event.getMessageAuthor().getId();
+        if(creatorID == 394445942478209024L /*DEEMO*/ || creatorID == 225647075897901068L /*JUICY*/){
+            System.exit(0);
+        }
+    }
 }

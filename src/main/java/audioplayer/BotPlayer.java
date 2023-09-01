@@ -17,7 +17,9 @@ public class BotPlayer {
     public void play(DiscordApi api, MessageCreateEvent event, String content) {
 
         if (event.getMessageAuthor().getConnectedVoiceChannel().isPresent()) {
+            System.out.println("Test");
             event.getMessageAuthor().getConnectedVoiceChannel().get().connect().thenAccept(audioConnection -> {
+                System.out.println("Test2");
 
                 // Create a player manager
                 AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
@@ -29,6 +31,12 @@ public class BotPlayer {
                 // Create an audio source and add it to the audio connection's queue
                 AudioSource source = new LavaplayerAudioSource(api, player);
                 audioConnection.setAudioSource(source);
+
+                api.addMessageCreateListener(stopEvent -> {
+                    if(stopEvent.getMessageContent().startsWith("!stop")){
+                        audioConnection.close();
+                    }
+                });
 
                 // You can now use the AudioPlayer like you would normally do with Lavaplayer, e.g.,
                 playerManager.loadItem(content, new AudioLoadResultHandler() {
@@ -54,13 +62,10 @@ public class BotPlayer {
                         // Notify the user that everything exploded
                     }
                 });
-
-                api.addMessageCreateListener(stopEvent -> {
-                    if(stopEvent.getMessageContent().startsWith("!stop")){
-                        audioConnection.close();
-                    }
-                });
+            }).exceptionally(e -> {
+                System.out.println(e.getMessage());
+                return null;
             });
         }
-    }
+    };
 }
