@@ -1,5 +1,4 @@
 package audioplayer;
-
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -12,14 +11,13 @@ import org.javacord.api.DiscordApi;
 import org.javacord.api.audio.AudioSource;
 import org.javacord.api.event.message.MessageCreateEvent;
 
+
 public class BotPlayer {
 
     public void play(DiscordApi api, MessageCreateEvent event, String content) {
 
         if (event.getMessageAuthor().getConnectedVoiceChannel().isPresent()) {
-            System.out.println("Test");
             event.getMessageAuthor().getConnectedVoiceChannel().get().connect().thenAccept(audioConnection -> {
-                System.out.println("Test2");
 
                 // Create a player manager
                 AudioPlayerManager playerManager = new DefaultAudioPlayerManager();

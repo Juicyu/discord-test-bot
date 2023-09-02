@@ -19,7 +19,7 @@ public class MainProgram {
         String token = PropertiesReader.getProperty("token");
         DiscordApi api = new DiscordApiBuilder()
                 .setToken(token)
-                .addIntents(Intent.MESSAGE_CONTENT)
+                .addIntents(Intent.MESSAGE_CONTENT)//vorher MESSAGE_CONTENT genau wie im Tutorial, wurde aber als Fehler angezeigt
                 .login()
                 .join();
         //All permissions: 1099511627775
@@ -33,11 +33,14 @@ public class MainProgram {
 
         //Erstellung der Befehlsliste für den Bot und Aufruf der entsprechenden Methoden
         api.addMessageCreateListener(event -> {
-            String command = event.getMessageContent().split("\s")[0].toLowerCase();
+            String message = event.getMessageContent();
+            String command = message.split("\s")[0].toLowerCase();
             String content = "0";
 
-            if (event.getMessageContent().startsWith("!del") || event.getMessageContent().startsWith("!play")) {
-                content = event.getMessageContent().split("\s")[1];
+            if (message.startsWith("!del")
+                    || message.startsWith("!play")
+                    || message.startsWith("!autodeleteon")) {
+                content = message.split("\s")[1];
             }
 
             try{
@@ -47,6 +50,7 @@ public class MainProgram {
                     case ("!muteall") -> channelManager.muteAll(event);
                     case ("!unmuteall") -> channelManager.unmuteAll(event);
                     case ("!del") -> channelManager.deleteMessages(event, content);
+                    case ("!autodeleteon") -> channelManager.autoDeleteOn(event, content);
                     case ("!anleitung") -> general.zeigeAnleitung(event);
                     case ("!play") -> botPlayer.play(api, event, content);
                     case ("!shutdown") -> general.shutdown(event);
