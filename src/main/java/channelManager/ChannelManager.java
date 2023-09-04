@@ -3,6 +3,7 @@ package channelManager;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannelBuilder;
 import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.channel.server.ServerChannelChangeNameEvent;
 import org.javacord.api.event.channel.server.ServerChannelCreateEvent;
@@ -12,8 +13,10 @@ import org.javacord.api.listener.message.MessageCreateListener;
 import org.javacord.api.util.event.ListenerManager;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 public class ChannelManager {
 
@@ -60,12 +63,6 @@ public class ChannelManager {
     public void autoDeleteOn(MessageCreateEvent event, String time) {
         TextChannel textChannel = event.getChannel();
         //alle Message-Create-Listener entfernen, damit bei einem Update die alten Create-Listener entfernt werden
-        if(!textChannel.getMessageCreateListeners().isEmpty()){
-            Iterator<MessageCreateListener> iterator = textChannel.getMessageCreateListeners().iterator();
-            while(iterator.hasNext()){
-                iterator.remove();
-            }
-        }
 
         //speichere Stunden
         String[] tempVal = time.split("h");
@@ -84,7 +81,7 @@ public class ChannelManager {
         //Berechne das Interval
         int interval = sekunden * 1000 + minuten * 1000 * 60 + stunden * 1000 * 60 * 24;
         System.out.println("Interval: " + interval);
-        System.out.println("Anzahl Listener: " + event.getChannel().getMessageCreateListeners().size());
+        System.out.println("Anzahl Listener: " + textChannel.getMessageCreateListeners().size());
         textChannel.sendMessage("Auto-Delete aktiviert! Nachrichten in diesem Channel werden nach "
                 + stunden + "h "
                 + minuten + "m "
@@ -92,6 +89,11 @@ public class ChannelManager {
                 + "gelöscht!").join();
         ListenerManager<MessageCreateListener> listener = textChannel.addMessageCreateListener(e -> {
             e.getMessage().deleteAfter(Duration.ofMillis(interval));
+        });
+        textChannel.addMessageCreateListener(e -> {
+            if (e.getMessage().getContent().startsWith("!autodeleteon")) {
+                listener.remove();
+            }
         });
     }
 
@@ -139,7 +141,7 @@ public class ChannelManager {
 
                             //Channeluser < 1, dann Channel entfernen
                             newChannel.addServerVoiceChannelMemberLeaveListener(leaveEvent -> {
-                                if (leaveEvent.getChannel().getConnectedUserIds().size() < 1) {
+                                if (leaveEvent.getChannel().getConnectedUserIds().isEmpty()) {
                                     newChannel.delete();
                                 }
                             });

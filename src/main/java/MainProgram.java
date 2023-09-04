@@ -50,7 +50,7 @@ public class MainProgram {
                     case ("!muteall") -> channelManager.muteAll(event);
                     case ("!unmuteall") -> channelManager.unmuteAll(event);
                     case ("!del") -> channelManager.deleteMessages(event, content);
-                    case ("!autodeleteon") -> channelManager.autoDeleteOn(event, content);
+                    //case ("!autodeleteon") -> channelManager.autoDeleteOn(event, content);
                     case ("!anleitung") -> general.zeigeAnleitung(event);
                     case ("!play") -> botPlayer.play(api, event, content);
                     case ("!shutdown") -> general.shutdown(event);
