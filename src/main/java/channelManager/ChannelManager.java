@@ -1,5 +1,6 @@
 package channelManager;
 
+import org.javacord.api.DiscordApi;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannelBuilder;
 import org.javacord.api.entity.channel.TextChannel;
@@ -92,6 +93,7 @@ public class ChannelManager {
         });
         textChannel.addMessageCreateListener(e -> {
             if (e.getMessage().getContent().startsWith("!autodeleteon")) {
+                MessageCreateListener messageCreateListener = e.getChannel().getMessageCreateListeners().get(0);
                 listener.remove();
             }
         });
