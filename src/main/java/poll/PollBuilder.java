@@ -1,14 +1,23 @@
 package poll;
 
+import org.javacord.api.entity.channel.ServerTextChannel;
+import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
-import org.javacord.api.entity.message.MessageBuilder;
-import org.javacord.api.entity.message.component.ActionRow;
+import org.javacord.api.entity.message.Reaction;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
-import org.javacord.api.event.interaction.SlashCommandCreateEvent;
+import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
+import org.javacord.api.event.message.reaction.ReactionAddEvent;
+import org.javacord.api.event.message.reaction.ReactionRemoveEvent;
+import org.javacord.api.listener.message.reaction.ReactionAddListener;
+import org.javacord.api.listener.message.reaction.ReactionRemoveListener;
+import org.w3c.dom.Text;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 
 public final class PollBuilder {
 
@@ -71,19 +80,92 @@ public final class PollBuilder {
       event.getMessage().delete();
    }
 
-   public static void createPublicPoll(SlashCommandCreateEvent event,
-                                       boolean multipleChoice,
-                                       String question,
-                                       ArrayList<String> answereList,
-                                       ArrayList<Integer> timeList) {
+   public void createPublicPollSingle(PollValue pollValue) {
+      ReactionAddListener reactionAddListener = null;
+      ReactionRemoveListener reactionRemoveListener = null;
+      //Eingebette Message erstellen
+      EmbedBuilder pollEmbeded = new EmbedBuilder()
+         .setAuthor(pollValue.getEvent().getInteraction().getUser())
+         .setTitle(pollValue.getTitel())
+         .addField("Frage: ", pollValue.getQuestion())
+         .setColor(Color.red);
+
+      for (int i = 1; i <= pollValue.getAnswereList().size(); i++) {
+         pollEmbeded.addField("Antwort: ", numberEmojis.get(i) + pollValue.getAnswereList().get(i - 1));
+      }
+
+      Message finishedPoll = pollValue.getTextChannel().sendMessage(pollEmbeded).join();
+
+      for (int i = 1; i <= pollValue.getAnswereList().size(); i++) {
+         finishedPoll.addReaction(numberReactions.get(i)).join();
+         reactionAddListener = new ReactionAddListener() {
+            @Override
+            public void onReactionAdd(ReactionAddEvent event) {
+               User user = event.getUser().get();
+               Reaction reaction = event.getReaction().get();
+               // Wenn die Reaktion von einem Bot kommt, soll sie ignoriert werden!
+               try{
+                  if(user.isBot()){
+                     return;
+                  }
+                  // Wenn der User noch nicht auf der Liste ist, entferne ihn
+                  if(!pollValue.getUserList1().contains(user)){
+                     pollValue.getUserList1().add(user);
+                  } else {
+                     reaction.removeUser(user);
+                  }
+
+               } catch (Exception e){
+                  ServerTextChannel bottasLog = (ServerTextChannel) event.getServer().get().getChannelsByName("bottas-log").get(0);
+                  System.out.println(e.getMessage());
+                  bottasLog.sendMessage(e.getMessage());
+                  bottasLog.sendMessage(Arrays.toString(e.getStackTrace()));
+               }
+               System.out.println(pollValue.getUserList1());
+            }
+         };
+
+         reactionRemoveListener = new ReactionRemoveListener() {
+            @Override
+            public void onReactionRemove(ReactionRemoveEvent event) {
+               User user = event.getUser().get();
+               List<Reaction> reactions = event.getMessage().get().getReactions();
+               Set<User> tempUserList = new HashSet<>();
+               boolean containsUser = false;
+
+               reactions.forEach(reaction -> {
+                  try {
+                     Set<User> users = reaction.getUsers().get();
+                     tempUserList.addAll(users);
+                  } catch (InterruptedException e) {
+                     throw new RuntimeException(e);
+                  } catch (ExecutionException e) {
+                     throw new RuntimeException(e);
+                  }
+               });
+
+               if(tempUserList.contains(user)){
+                  return;
+               } else {
+                  pollValue.getUserList1().remove(user);
+               }
+               pollValue.getUserList1().remove(user);
+               System.out.println(pollValue.getUserList1());
+            }
+         };
+      }
+      finishedPoll.addReactionAddListener(reactionAddListener);
+      finishedPoll.addReactionRemoveListener(reactionRemoveListener);
+   }
+
+   public void createPublicPollMulti(PollValue pollValue){
 
    }
 
-   public static void createAnonymPoll(SlashCommandCreateEvent event,
-                                       boolean multipleChoice,
-                                       String question,
-                                       ArrayList<String> answereList,
-                                       ArrayList<Integer> timeList) {
+   public void createAnonymPollSingle(PollValue pollValue){
+
+   }
+   public void createAnonymPollMulti(PollValue pollValue) {
 
    }
 }

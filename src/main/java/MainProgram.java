@@ -7,13 +7,17 @@ import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.intent.Intent;
+import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import org.javacord.api.interaction.*;
 import org.javacord.api.listener.interaction.SlashCommandCreateListener;
 import poll.PollBuilder;
+import poll.PollValue;
 import properties.PropertiesReader;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,7 +31,7 @@ public class MainProgram {
       String token = PropertiesReader.getProperty("token");
       DiscordApi api = new DiscordApiBuilder()
          .setToken(token)
-         .addIntents(Intent.MESSAGE_CONTENT)//vorher MESSAGE_CONTENT genau wie im Tutorial, wurde aber als Fehler angezeigt
+         .addIntents(Intent.MESSAGE_CONTENT, Intent.GUILD_MEMBERS)//vorher MESSAGE_CONTENT genau wie im Tutorial, wurde aber als Fehler angezeigt
          .login()
          .join();
       //All permissions: 1099511627775
@@ -84,28 +88,28 @@ public class MainProgram {
       SlashCommand pollCommand =
          SlashCommand.with("umfrage", "startet eine Umfrage", Arrays.asList(
                   SlashCommandOption.create(SlashCommandOptionType.CHANNEL, "Channel", "test", true),
-                  SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "Privatsphäre", "Soll die Abstimmung anonym oder öffentlich erfolgen?", true,
+                  SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "privatsphäre", "Soll die Abstimmung anonym oder öffentlich erfolgen?", true,
                      Arrays.asList(
                         SlashCommandOptionChoice.create("öffentlich", "öffentlich"),
                         SlashCommandOptionChoice.create("anonym", "anonym")
                      )
                   ),
-                  SlashCommandOption.createWithChoices(SlashCommandOptionType.BOOLEAN, "Mehrfachauswahl", "Soll ein User mehr als eine Antwort wählen dürfen?", true,
+                  SlashCommandOption.createWithChoices(SlashCommandOptionType.BOOLEAN, "mehrfachauswahl", "Soll ein User mehr als eine Antwort wählen dürfen?", true,
                      Arrays.asList(
                         SlashCommandOptionChoice.create("ja", "true"),
                         SlashCommandOptionChoice.create("nein", "false")
                      )
                   ),
-                  SlashCommandOption.create(SlashCommandOptionType.STRING, "Titel", "Welchen Titel möchtest Du Deiner Umfrage geben?", true),
-                  SlashCommandOption.create(SlashCommandOptionType.STRING, "Frage", "Welche Frage möchtest Du stellen?", true),
-                  SlashCommandOption.create(SlashCommandOptionType.STRING, "Antwort1", "Geben Sie die erste Antwortmöglichkeit ein", true),
-                  SlashCommandOption.create(SlashCommandOptionType.STRING, "Antwort2", "Geben Sie die zweite Antwortmöglichkeit ein"),
-                  SlashCommandOption.create(SlashCommandOptionType.STRING, "Antwort3", "Geben Sie die dritte Antwortmöglichkeit ein"),
-                  SlashCommandOption.create(SlashCommandOptionType.STRING, "Antwort4", "Geben Sie die vierte Antwortmöglichkeit ein"),
-                  SlashCommandOption.create(SlashCommandOptionType.STRING, "Antwort5", "Geben Sie die fünfte Antwortmöglichkeit ein"),
-                  SlashCommandOption.createLongOption("Stunden", "Wie viele Stunden soll die Umfrage aktiv sein?", false, 0, (24 * 7)),
-                  SlashCommandOption.createLongOption("Minuten", "Wie viele Minuten soll die Umfrage aktiv sein?", false, 0, 59),
-                  SlashCommandOption.createLongOption("Sekunden", "Wie viele Sekunden soll die Umfrage aktiv sein?", false, 0, 59)
+                  SlashCommandOption.create(SlashCommandOptionType.STRING, "titel", "Welchen titel möchtest Du Deiner Umfrage geben?", true),
+                  SlashCommandOption.create(SlashCommandOptionType.STRING, "frage", "Welche frage möchtest Du stellen?", true),
+                  SlashCommandOption.create(SlashCommandOptionType.STRING, "antwort1", "Geben Sie die erste Antwortmöglichkeit ein", true),
+                  SlashCommandOption.create(SlashCommandOptionType.STRING, "antwort2", "Geben Sie die zweite Antwortmöglichkeit ein"),
+                  SlashCommandOption.create(SlashCommandOptionType.STRING, "antwort3", "Geben Sie die dritte Antwortmöglichkeit ein"),
+                  SlashCommandOption.create(SlashCommandOptionType.STRING, "antwort4", "Geben Sie die vierte Antwortmöglichkeit ein"),
+                  SlashCommandOption.create(SlashCommandOptionType.STRING, "antwort5", "Geben Sie die fünfte Antwortmöglichkeit ein"),
+                  SlashCommandOption.createLongOption("stunden", "Wie viele stunden soll die Umfrage aktiv sein?", false, 0, (24 * 7)),
+                  SlashCommandOption.createLongOption("minuten", "Wie viele minuten soll die Umfrage aktiv sein?", false, 0, 59),
+                  SlashCommandOption.createLongOption("sekunden", "Wie viele sekunden soll die Umfrage aktiv sein?", false, 0, 59)
                )
             )
             .createGlobal(api)
@@ -123,114 +127,121 @@ public class MainProgram {
             String question = "";
             ArrayList<String> answereList = new ArrayList<String>();
             ArrayList<Integer> timeList = new ArrayList<Integer>();
-            ArrayList<String> numberEmojis = new ArrayList<String>();
-            ArrayList<String> numberReactions = new ArrayList<String>();
-            List<User> answereList1 = new ArrayList<User>();
-            List<User> answereList2 = new ArrayList<User>();
-            List<User> answereList3 = new ArrayList<User>();
-            List<User> answereList4 = new ArrayList<User>();
-            List<User> answereList5 = new ArrayList<User>();
-            final String progressBarElementFilled = "█";
-            final String progressBarElementUnfilled = "░";
+            List<User> userList1 = new ArrayList<User>();
+            List<User> userList2 = new ArrayList<User>();
+            List<User> userList3 = new ArrayList<User>();
+            List<User> userList4 = new ArrayList<User>();
+            List<User> userList5 = new ArrayList<User>();
+            Interaction userInteraction = event.getInteraction();
+            PollValue pollValue;
 
-            // Reactions/Emojis Listen befüllen
-            numberEmojis.add(":zero: ");
-            numberEmojis.add(":one: ");
-            numberEmojis.add(":two: ");
-            numberEmojis.add(":three: ");
-            numberEmojis.add(":four: ");
-            numberEmojis.add(":five: ");
-            numberEmojis.add(":six: ");
-            numberEmojis.add(":seven: ");
-            numberEmojis.add(":eight: ");
-            numberEmojis.add(":nine: ");
-            numberEmojis.add("\uD83D\uDD1F ");
-
-            numberReactions.add("0️⃣");
-            numberReactions.add("1️⃣");
-            numberReactions.add("2️⃣");
-            numberReactions.add("3️⃣");
-            numberReactions.add("4️⃣");
-            numberReactions.add("5️⃣");
-            numberReactions.add("6️⃣");
-            numberReactions.add("7️⃣");
-            numberReactions.add("8️⃣");
-            numberReactions.add("9️⃣");
-            numberReactions.add("\uD83D\uDD1F");
-
-            //Sicheres Abfragen aller Eingaben
-            if (interaction.getOptionByName("Channel").isPresent() &&
-               interaction.getOptionByName("Channel").get().getStringValue().isPresent()) {
-               channel = interaction.getOptionByName("Channel").get().getChannelValue().get();
+            //Sicheres Abfragen aller Eingabe
+            if (interaction.getOptionByName("channel").isPresent() &&
+               interaction.getOptionByName("channel").get().getChannelValue().isPresent()) {
+               channel = interaction.getOptionByName("channel").get().getChannelValue().get();
             }
             //--rufe den Channel ab und prüfe, ob es sich um einen Textchannel handelt!
             try {
                textChannel = (ServerTextChannel) channel;
             } catch (Exception e) {
                interaction.getUser().sendMessage("Bei der Erstellung Ihrer Umfrage gab es ein Problem!");
+               assert channel != null;
+               ServerTextChannel bottasLog = (ServerTextChannel) channel.getServer().getChannelsByName("bottas-log").get(0);
+               System.out.println(e.getMessage());
+               bottasLog.sendMessage(e.getMessage());
+               bottasLog.sendMessage(Arrays.toString(e.getStackTrace()));
             }
             //--
-            if (interaction.getOptionByName("Privatsphäre").isPresent() &&
-               interaction.getOptionByName("Privatsphäre").get().getStringValue().isPresent()) {
-               privacy = interaction.getOptionByName("Privatsphäre").get().getStringValue().get();
+
+            if (interaction.getOptionByName("privatsphäre").isPresent() &&
+               interaction.getOptionByName("privatsphäre").get().getStringValue().isPresent()) {
+               privacy = interaction.getOptionByName("privatsphäre").get().getStringValue().get();
             }
-            if (interaction.getOptionByName("Mehrfachauswahl").isPresent() &&
-               interaction.getOptionByName("Mehrfachauswahl").get().getStringValue().isPresent()) {
-               multipleChoice = Boolean.parseBoolean(interaction.getOptionByName("Mehrfachauswahl").get().getStringValue().get());
+            if (interaction.getOptionByName("mehrfachauswahl").isPresent() &&
+               interaction.getOptionByName("mehrfachauswahl").get().getStringValue().isPresent()) {
+               multipleChoice = Boolean.parseBoolean(interaction.getOptionByName("mehrfachauswahl").get().getStringValue().get());
             }
-            if (interaction.getOptionByName("Titel").isPresent() &&
-               interaction.getOptionByName("Titel").get().getStringValue().isPresent()) {
-               titel = interaction.getOptionByName("Titel").get().getStringValue().get();
+            if (interaction.getOptionByName("titel").isPresent() &&
+               interaction.getOptionByName("titel").get().getStringValue().isPresent()) {
+               titel = interaction.getOptionByName("titel").get().getStringValue().get();
             }
-            if (interaction.getOptionByName("Frage").isPresent() &&
-               interaction.getOptionByName("Frage").get().getStringValue().isPresent()) {
-               question = interaction.getOptionByName("Frage").get().getStringValue().get();
+            // Frage
+            if (interaction.getOptionByName("frage").isPresent() &&
+               interaction.getOptionByName("frage").get().getStringValue().isPresent()) {
+               question = interaction.getOptionByName("frage").get().getStringValue().get();
             }
-            if (interaction.getOptionByName("Antwort1").isPresent() &&
-               interaction.getOptionByName("Antwort1").get().getStringValue().isPresent()) {
-               String answere1 = interaction.getOptionByName("Antwort1").get().getStringValue().get();
+            // Antwort 1
+            if (interaction.getOptionByName("antwort1").isPresent() &&
+               interaction.getOptionByName("antwort1").get().getStringValue().isPresent()) {
+               String answere1 = interaction.getOptionByName("antwort1").get().getStringValue().get();
                answereList.add(answere1);
             }
-            if (interaction.getOptionByName("Antwort2").isPresent() &&
-               interaction.getOptionByName("Antwort2").get().getStringValue().isPresent()) {
-               String answere2 = interaction.getOptionByName("Antwort2").get().getStringValue().get();
+            // Antwort 2
+            if (interaction.getOptionByName("antwort2").isPresent() &&
+               interaction.getOptionByName("antwort2").get().getStringValue().isPresent()) {
+               String answere2 = interaction.getOptionByName("antwort2").get().getStringValue().get();
                answereList.add(answere2);
             }
-            if (interaction.getOptionByName("Antwort3").isPresent() &&
-               interaction.getOptionByName("Antwort3").get().getStringValue().isPresent()) {
-               String answere3 = interaction.getOptionByName("Antwort3").get().getStringValue().get();
+            // Antwort 3
+            if (interaction.getOptionByName("antwort3").isPresent() &&
+               interaction.getOptionByName("antwort3").get().getStringValue().isPresent()) {
+               String answere3 = interaction.getOptionByName("antwort3").get().getStringValue().get();
                answereList.add(answere3);
             }
-            if (interaction.getOptionByName("Antwort4").isPresent() &&
-               interaction.getOptionByName("Antwort4").get().getStringValue().isPresent()) {
-               String answere4 = interaction.getOptionByName("Antwort4").get().getStringValue().get();
+            // Antwort 4
+            if (interaction.getOptionByName("antwort4").isPresent() &&
+               interaction.getOptionByName("antwort4").get().getStringValue().isPresent()) {
+               String answere4 = interaction.getOptionByName("antwort4").get().getStringValue().get();
                answereList.add(answere4);
             }
-            if (interaction.getOptionByName("Antwort5").isPresent() &&
-               interaction.getOptionByName("Antwort5").get().getStringValue().isPresent()) {
-               String answere5 = interaction.getOptionByName("Antwort5").get().getStringValue().get();
+            // Antwort 5
+            if (interaction.getOptionByName("antwort5").isPresent() &&
+               interaction.getOptionByName("antwort5").get().getStringValue().isPresent()) {
+               String answere5 = interaction.getOptionByName("antwort5").get().getStringValue().get();
                answereList.add(answere5);
             }
-            if (privacy.equals("öffentlich")) {
-               PollBuilder.createPublicPoll(event, multipleChoice, question, answereList, timeList);
-            }
-            if (privacy.equals("anonym")) {
-               PollBuilder.createAnonymPoll(event, multipleChoice, question, answereList, timeList);
-            }
-            if (interaction.getOptionByName("Stunden").isPresent() &&
-               interaction.getOptionByName("Stunden").get().getStringValue().isPresent()) {
-               String stunden = interaction.getOptionByName("Stunden").get().getStringValue().get();
+            if (interaction.getOptionByName("stunden").isPresent() &&
+               interaction.getOptionByName("stunden").get().getStringValue().isPresent()) {
+               String stunden = interaction.getOptionByName("stunden").get().getStringValue().get();
                timeList.add(Integer.parseInt(stunden));
             }
-            if (interaction.getOptionByName("Minuten").isPresent() &&
-               interaction.getOptionByName("Minuten").get().getStringValue().isPresent()) {
-               String minuten = interaction.getOptionByName("Minuten").get().getStringValue().get();
+            if (interaction.getOptionByName("minuten").isPresent() &&
+               interaction.getOptionByName("minuten").get().getStringValue().isPresent()) {
+               String minuten = interaction.getOptionByName("minuten").get().getStringValue().get();
                timeList.add(Integer.parseInt(minuten));
             }
-            if (interaction.getOptionByName("Sekunden").isPresent() &&
-               interaction.getOptionByName("Sekunden").get().getStringValue().isPresent()) {
-               String sekunden = interaction.getOptionByName("Sekunden").get().getStringValue().get();
+            if (interaction.getOptionByName("sekunden").isPresent() &&
+               interaction.getOptionByName("sekunden").get().getStringValue().isPresent()) {
+               String sekunden = interaction.getOptionByName("sekunden").get().getStringValue().get();
                timeList.add(Integer.parseInt(sekunden));
+            }
+            pollValue = new PollValue(event,
+                                      multipleChoice,
+                                      titel,
+                                      question,
+                                      channel,
+                                      textChannel,
+                                      privacy,
+                                      answereList,
+                                      timeList,
+                                      userList1,
+                                      userList2,
+                                      userList3,
+                                      userList4,
+                                      userList5
+               );
+            //Aufruf der entsprechenden Methode zur Umfragenerstellung
+            if (privacy.equals("öffentlich") && !multipleChoice) {
+               pollBuilder.createPublicPollSingle(pollValue);
+            }
+            if (privacy.equals("öffentlich") && !multipleChoice) {
+               pollBuilder.createPublicPollMulti(pollValue);
+            }
+            if (privacy.equals("anonym") && !multipleChoice) {
+               pollBuilder.createAnonymPollSingle(pollValue);
+            }
+            if (privacy.equals("anonym") && multipleChoice) {
+               pollBuilder.createAnonymPollMulti(pollValue);
             }
          }
       };
