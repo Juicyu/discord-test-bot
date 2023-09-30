@@ -3,12 +3,19 @@ package poll;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.TextChannel;
 import org.javacord.api.entity.message.Message;
+import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.Reaction;
+import org.javacord.api.entity.message.component.ActionRow;
+import org.javacord.api.entity.message.component.Button;
+import org.javacord.api.entity.message.component.HighLevelComponent;
+import org.javacord.api.entity.message.component.LowLevelComponent;
 import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
+import org.javacord.api.event.interaction.ButtonClickEvent;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.event.message.reaction.ReactionAddEvent;
 import org.javacord.api.event.message.reaction.ReactionRemoveEvent;
+import org.javacord.api.listener.interaction.ButtonClickListener;
 import org.javacord.api.listener.message.reaction.ReactionAddListener;
 import org.javacord.api.listener.message.reaction.ReactionRemoveListener;
 import org.w3c.dom.Text;
@@ -19,7 +26,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 
-public final class PollBuilder {
+public class PollBuilder {
 
    private final ArrayList<String> numberEmojis = new ArrayList<>();
    private final ArrayList<String> numberReactions = new ArrayList<>();
@@ -80,19 +87,31 @@ public final class PollBuilder {
       event.getMessage().delete();
    }
 
+   private EmbedBuilder createPollMessage(PollValue pollValue){
+      return new EmbedBuilder()
+         .setAuthor(pollValue.getEvent().getInteraction().getUser())
+         .setTitle(pollValue.getTitel())
+         .addField("Frage: ", pollValue.getQuestion())
+         .setColor(Color.red)
+         .setFooter(
+            "Sichtbarkeit: " + pollValue.getPrivacy() +
+               "\nMutliple Choice: " + pollValue.isMultipleChoice()
+         );
+   }
+
+   private void addAnsweres(EmbedBuilder pollEmbeded, PollValue pollValue){
+      for (int i = 1; i <= pollValue.getAnswereList().size(); i++) {
+         pollEmbeded.addField("Antwort: ", numberEmojis.get(i) + pollValue.getAnswereList().get(i - 1));
+      }
+   }
+
    public void createPublicPollSingle(PollValue pollValue) {
       ReactionAddListener reactionAddListener = null;
       ReactionRemoveListener reactionRemoveListener = null;
       //Eingebette Message erstellen
-      EmbedBuilder pollEmbeded = new EmbedBuilder()
-         .setAuthor(pollValue.getEvent().getInteraction().getUser())
-         .setTitle(pollValue.getTitel())
-         .addField("Frage: ", pollValue.getQuestion())
-         .setColor(Color.red);
+      EmbedBuilder pollEmbeded = createPollMessage(pollValue);
 
-      for (int i = 1; i <= pollValue.getAnswereList().size(); i++) {
-         pollEmbeded.addField("Antwort: ", numberEmojis.get(i) + pollValue.getAnswereList().get(i - 1));
-      }
+      this.addAnsweres(pollEmbeded, pollValue);
 
       Message finishedPoll = pollValue.getTextChannel().sendMessage(pollEmbeded).join();
 
@@ -159,13 +178,45 @@ public final class PollBuilder {
    }
 
    public void createPublicPollMulti(PollValue pollValue){
+      EmbedBuilder pollEmbeded = createPollMessage(pollValue);
+      this.addAnsweres(pollEmbeded, pollValue);
 
+      Message finishedPoll = pollValue.getTextChannel().sendMessage(pollEmbeded).join();
+      for (int i = 1; i <= pollValue.getAnswereList().size(); i++) {
+         finishedPoll.addReaction(numberReactions.get(i)).join();
+      }
    }
 
    public void createAnonymPollSingle(PollValue pollValue){
 
    }
    public void createAnonymPollMulti(PollValue pollValue) {
-
+      EmbedBuilder pollEmbeded = createPollMessage(pollValue);
+      this.addAnsweres(pollEmbeded, pollValue);
+      List<ArrayList<User>> userLists = new ArrayList<>();
+      List<LowLevelComponent> buttons = new ArrayList<>();
+      for(int i = 0; i < pollValue.getAnswereList().size(); i++) {
+         userLists.add(new ArrayList<User>());
+         Button button = Button.primary("button" + i+1, "Option " + (i+1));
+         int finalI = i;
+         ButtonClickListener listener = new ButtonClickListener() {
+            @Override
+            public void onButtonClick(ButtonClickEvent event) {
+               boolean exists = false;
+               User user = event.getInteraction().getUser();
+               if(userLists.get(finalI).contains(user)){
+                  userLists.get(finalI).remove(user);
+               } else {
+                  userLists.get(finalI).add(user);
+               }
+               userLists.forEach(System.out::println);
+            }
+         };
+         buttons.add(button);
+      }
+      MessageBuilder finishedPoll = new MessageBuilder()
+         .addEmbed(pollEmbeded)
+         .addComponents(ActionRow.of(buttons));
+      finishedPoll.send(pollValue.getTextChannel());
    }
 }

@@ -7,8 +7,6 @@ import org.javacord.api.entity.channel.ServerChannel;
 import org.javacord.api.entity.channel.ServerTextChannel;
 import org.javacord.api.entity.channel.ServerVoiceChannel;
 import org.javacord.api.entity.intent.Intent;
-import org.javacord.api.entity.message.Message;
-import org.javacord.api.entity.message.embed.EmbedBuilder;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.interaction.SlashCommandCreateEvent;
 import org.javacord.api.interaction.*;
@@ -16,8 +14,6 @@ import org.javacord.api.listener.interaction.SlashCommandCreateListener;
 import poll.PollBuilder;
 import poll.PollValue;
 import properties.PropertiesReader;
-
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,6 +47,9 @@ public class MainProgram {
 
          if (message.startsWith("!del")
             || message.startsWith("!play")
+            || message.startsWith("!roll")
+            || message.startsWith("!rollDestiny")
+            || message.startsWith("!rollDestinyBetween")
             || message.startsWith("!autodeleteon")) {
             content = message.split("\s")[1];
          }
@@ -65,6 +64,9 @@ public class MainProgram {
                //case ("!autodeleteon") -> channelManager.autoDeleteOn(event, content);
                case ("!anleitung") -> general.zeigeAnleitung(event);
                case ("!play") -> botPlayer.play(api, event, content);
+               case ("!roll") -> general.rollDice(event, content);
+               case ("!rolldestiny") -> general.rollDestiny(event, content);
+               case ("!rolldestinybetween") -> general.rollDestinyBetween(event, content);
                case ("!shutdown") -> general.shutdown(event);
             }
          } catch (Error e) {
@@ -127,11 +129,7 @@ public class MainProgram {
             String question = "";
             ArrayList<String> answereList = new ArrayList<String>();
             ArrayList<Integer> timeList = new ArrayList<Integer>();
-            List<User> userList1 = new ArrayList<User>();
-            List<User> userList2 = new ArrayList<User>();
-            List<User> userList3 = new ArrayList<User>();
-            List<User> userList4 = new ArrayList<User>();
-            List<User> userList5 = new ArrayList<User>();
+            List<User> userList1 = new ArrayList<>();
             Interaction userInteraction = event.getInteraction();
             PollValue pollValue;
 
@@ -157,10 +155,8 @@ public class MainProgram {
                interaction.getOptionByName("privatsphäre").get().getStringValue().isPresent()) {
                privacy = interaction.getOptionByName("privatsphäre").get().getStringValue().get();
             }
-            if (interaction.getOptionByName("mehrfachauswahl").isPresent() &&
-               interaction.getOptionByName("mehrfachauswahl").get().getStringValue().isPresent()) {
-               multipleChoice = Boolean.parseBoolean(interaction.getOptionByName("mehrfachauswahl").get().getStringValue().get());
-            }
+            // Mehrfachauswahl
+            multipleChoice = interaction.getOptionByName("mehrfachauswahl").get().getBooleanValue().get();
             if (interaction.getOptionByName("titel").isPresent() &&
                interaction.getOptionByName("titel").get().getStringValue().isPresent()) {
                titel = interaction.getOptionByName("titel").get().getStringValue().get();
@@ -224,17 +220,13 @@ public class MainProgram {
                                       privacy,
                                       answereList,
                                       timeList,
-                                      userList1,
-                                      userList2,
-                                      userList3,
-                                      userList4,
-                                      userList5
+                                      userList1
                );
             //Aufruf der entsprechenden Methode zur Umfragenerstellung
             if (privacy.equals("öffentlich") && !multipleChoice) {
                pollBuilder.createPublicPollSingle(pollValue);
             }
-            if (privacy.equals("öffentlich") && !multipleChoice) {
+            if (privacy.equals("öffentlich") && multipleChoice) {
                pollBuilder.createPublicPollMulti(pollValue);
             }
             if (privacy.equals("anonym") && !multipleChoice) {

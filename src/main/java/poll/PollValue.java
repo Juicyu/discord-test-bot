@@ -18,10 +18,6 @@ public class PollValue {
    private List<String> answereList = new ArrayList<>();
    private List<Integer> timeList = new ArrayList<>();
    private List<User> userList1 = new ArrayList<>();
-   private List<User> userList2 = new ArrayList<>();
-   private List<User> userList3 = new ArrayList<>();
-   private List<User> userList4 = new ArrayList<>();
-   private List<User> userList5 = new ArrayList<>();
 
    public PollValue(SlashCommandCreateEvent event,
                     boolean multipleChoice,
@@ -32,11 +28,7 @@ public class PollValue {
                     String privacy,
                     List<String> answereList,
                     List<Integer> timeList,
-                    List<User> userList1,
-                    List<User> userList2,
-                    List<User> userList3,
-                    List<User> userList4,
-                    List<User> userList5) {
+                    List<User> userList1) {
       this.event = event;
       this.multipleChoice = multipleChoice;
       this.titel = titel;
@@ -46,10 +38,6 @@ public class PollValue {
       this.answereList = answereList;
       this.timeList = timeList;
       this.userList1 = userList1;
-      this.userList2 = userList2;
-      this.userList3 = userList3;
-      this.userList4 = userList4;
-      this.userList5 = userList5;
    }
 
    public SlashCommandCreateEvent getEvent() {
@@ -119,40 +107,8 @@ public class PollValue {
    public List<User> getUserList1() {
       return userList1;
    }
-
    public void setUserList1(List<User> userList1) {
       this.userList1 = userList1;
    }
 
-   public List<User> getUserList2() {
-      return userList2;
-   }
-
-   public void setUserList2(List<User> userList2) {
-      this.userList2 = userList2;
-   }
-
-   public List<User> getUserList3() {
-      return userList3;
-   }
-
-   public void setUserList3(List<User> userList3) {
-      this.userList3 = userList3;
-   }
-
-   public List<User> getUserList4() {
-      return userList4;
-   }
-
-   public void setUserList4(List<User> userList4) {
-      this.userList4 = userList4;
-   }
-
-   public List<User> getUserList5() {
-      return userList5;
-   }
-
-   public void setUserList5(List<User> userList5) {
-      this.userList5 = userList5;
-   }
 }
