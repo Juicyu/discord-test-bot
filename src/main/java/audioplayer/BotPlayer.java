@@ -3,6 +3,9 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
@@ -22,6 +25,8 @@ public class BotPlayer {
                 // Create a player manager
                 AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
                 playerManager.registerSourceManager(new YoutubeAudioSourceManager());
+                playerManager.registerSourceManager(new LocalAudioSourceManager());
+                AudioSourceManagers.registerLocalSource(playerManager);
                 AudioPlayer player = playerManager.createPlayer();
                 TrackScheduler trackScheduler = new TrackScheduler();
                 player.addListener(trackScheduler);
