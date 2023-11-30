@@ -99,6 +99,17 @@ public class PollBuilder {
          );
    }
 
+   private void addButtons(EmbedBuilder pollEmbeded, PollValue pollvalue) {
+      MessageBuilder buttonRow = new MessageBuilder();
+      for(int i = 1; i <= pollvalue.getQuestion().length(); i++){
+         buttonRow.addComponents(
+            ActionRow.of(
+               Button.primary("Button"+i, "Antwort "+1)
+            )
+         );
+      }
+   }
+
    private void addAnsweres(EmbedBuilder pollEmbeded, PollValue pollValue){
       for (int i = 1; i <= pollValue.getAnswereList().size(); i++) {
          pollEmbeded.addField("Antwort: ", numberEmojis.get(i) + pollValue.getAnswereList().get(i - 1));
@@ -193,6 +204,8 @@ public class PollBuilder {
    public void createAnonymPollMulti(PollValue pollValue) {
       EmbedBuilder pollEmbeded = createPollMessage(pollValue);
       this.addAnsweres(pollEmbeded, pollValue);
+      this.addButtons(pollEmbeded, pollValue);
+
       List<ArrayList<User>> userLists = new ArrayList<>();
       List<LowLevelComponent> buttons = new ArrayList<>();
       for(int i = 0; i < pollValue.getAnswereList().size(); i++) {

@@ -1,3 +1,4 @@
+import MacroBuilder.MacroBuilder;
 import audioplayer.BotPlayer;
 import channelManager.ChannelManager;
 import general.General;
@@ -38,6 +39,7 @@ public class MainProgram {
       PollBuilder pollBuilder = new PollBuilder();
       General general = new General();
       BotPlayer botPlayer = new BotPlayer();
+      MacroBuilder macroBuilder = new MacroBuilder();
 
       //Erstellung der Befehlsliste für den Bot und Aufruf der entsprechenden Methoden
       api.addMessageCreateListener(event -> {
@@ -67,6 +69,7 @@ public class MainProgram {
                case ("!roll") -> general.rollDice(event, content);
                case ("!rolldestiny") -> general.rollDestiny(event, content);
                case ("!rolldestinybetween") -> general.rollDestinyBetween(event, content);
+               case ("!macrobuilder") -> macroBuilder.sendMacroMessage(event);
                case ("!shutdown") -> general.shutdown(event);
             }
          } catch (Error e) {
@@ -92,8 +95,8 @@ public class MainProgram {
                   SlashCommandOption.create(SlashCommandOptionType.CHANNEL, "Channel", "test", true),
                   SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "privatsphäre", "Soll die Abstimmung anonym oder öffentlich erfolgen?", true,
                      Arrays.asList(
-                        SlashCommandOptionChoice.create("öffentlich", "öffentlich")
-                        //SlashCommandOptionChoice.create("anonym", "anonym")
+                        SlashCommandOptionChoice.create("öffentlich", "öffentlich"),
+                        SlashCommandOptionChoice.create("anonym", "anonym")
                      )
                   ),
                   SlashCommandOption.createWithChoices(SlashCommandOptionType.BOOLEAN, "mehrfachauswahl", "Soll ein User mehr als eine Antwort wählen dürfen?", true,
