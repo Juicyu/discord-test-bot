@@ -42,7 +42,10 @@ public class MainProgram {
       MacroBuilder macroBuilder = new MacroBuilder();
 
       //Sende eine Willkommens-Nachricht
-      api.addServerMemberJoinListener(event -> {
+      api.addUserRoleAddListener(event -> {
+         if(!event.getRole().getName().equals("Anwärter")){
+            return;
+         }
          String name = event.getUser().getName();
          name = name.substring(0,1).toUpperCase() + name.substring(1);
          String nachricht = "Du hast es geschafft, " + name + ", du hast den ersten Schritt gemeistert, um ein Teil von New Haven zu sein. \n" +
@@ -51,7 +54,7 @@ public class MainProgram {
                  "\n" +
                  "Zudem startet heute, wie hoffentlich im Bewerbungsgespräch erwähnt, deine Probezeit bei uns. Nutze diese Zeit so gut es geht, um uns kennenzulernen und gib uns durch deine Aktivität auch die Möglichkeit, dies bei dir zu tun.\n" +
                  "\n" +
-                 "In diesem Sinne nun genug der langen Worte und viel Spaß bei uns :NewHaven:";
+                 "In diesem Sinne nun genug der langen Worte und viel Spaß bei uns!";
          event.getUser().sendMessage(nachricht);
       });
 
@@ -85,7 +88,6 @@ public class MainProgram {
                case ("!rolldestinybetween") -> general.rollDestinyBetween(event, content);
                case ("!macrobuilder") -> macroBuilder.sendMacroMessage(event);
                case ("!shutdown") -> general.shutdown(event);
-               case ("!test") -> general.sendGreetings(event);
             }
          } catch (Error e) {
             System.out.println(e.getMessage());

@@ -128,17 +128,4 @@ public class General {
         });
         event.getChannel().sendMessage(message.toString());
     }
-
-    public void sendGreetings(MessageCreateEvent event) {
-        String name = event.getMessageAuthor().getDisplayName();
-        name = name.substring(0,1).toUpperCase() + name.substring(1);
-        String nachricht = "Du hast es geschafft, " + name + ", du hast den ersten Schritt gemeistert, um ein Teil von New Haven zu sein. \n" +
-                "\n" +
-                "Um richtig durchstarten zu können, möchten wir dich gerne an die Hand nehmen. Du findest eine Übersicht zu den wichtigsten Punkten im Kanal #faq. Lies diesen genau durch und die meisten Fragen sollten danach geklärt sein. \n" +
-                "\n" +
-                "Zudem startet heute, wie hoffentlich im Bewerbungsgespräch erwähnt, deine Probezeit bei uns. Nutze diese Zeit so gut es geht, um uns kennenzulernen und gib uns durch deine Aktivität auch die Möglichkeit, dies bei dir zu tun.\n" +
-                "\n" +
-                "In diesem Sinne nun genug der langen Worte und viel Spaß bei uns :NewHaven:";
-        event.getMessage().getUserAuthor().get().sendMessage(nachricht);
-    }
 }
