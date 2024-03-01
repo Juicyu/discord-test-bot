@@ -57,7 +57,7 @@ public class MainProgram {
          }
 
          if(event.getRole().getName().equals("WoW")){
-            String nachricht = "Du hast es geschafft, [User], du bist nun ein Teil von New Haven :NewHaven:, Gratulation und Willkommen!";
+            String nachricht = "Du hast es geschafft, " + name + ", du bist nun ein Teil von New Haven :NewHaven:, Gratulation und Willkommen!";
             event.getUser().sendMessage(nachricht);
          }
       });
