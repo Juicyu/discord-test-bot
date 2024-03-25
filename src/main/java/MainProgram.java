@@ -1,3 +1,4 @@
+import MacroBuilder.MacroBuilder;
 import audioplayer.BotPlayer;
 import channelManager.ChannelManager;
 import general.General;
@@ -38,6 +39,28 @@ public class MainProgram {
       PollBuilder pollBuilder = new PollBuilder();
       General general = new General();
       BotPlayer botPlayer = new BotPlayer();
+      MacroBuilder macroBuilder = new MacroBuilder();
+
+      //Sende eine Willkommens-Nachricht
+      api.addUserRoleAddListener(event -> {
+         String name = event.getUser().getName();
+         name = name.substring(0,1).toUpperCase() + name.substring(1);
+         if(event.getRole().getName().equals("Anwärter")){
+            String nachricht = "Du hast es geschafft, " + name + ", du hast den ersten Schritt gemeistert, um ein Teil von New Haven zu sein. \n" +
+                    "\n" +
+                    "Um richtig durchstarten zu können, möchten wir dich gerne an die Hand nehmen. Du findest eine Übersicht zu den wichtigsten Punkten im Kanal #faq. Lies diesen genau durch und die meisten Fragen sollten danach geklärt sein. \n" +
+                    "\n" +
+                    "Zudem startet heute, wie hoffentlich im Bewerbungsgespräch erwähnt, deine Probezeit bei uns. Nutze diese Zeit so gut es geht, um uns kennenzulernen und gib uns durch deine Aktivität auch die Möglichkeit, dies bei dir zu tun.\n" +
+                    "\n" +
+                    "In diesem Sinne nun genug der langen Worte und viel Spaß bei uns!";
+            event.getUser().sendMessage(nachricht);
+         }
+
+         if(event.getRole().getName().equals("WoW")){
+            String nachricht = "Du hast es geschafft, " + name + ", du bist nun ein Teil von New Haven :NewHaven:, Gratulation und Willkommen!";
+            event.getUser().sendMessage(nachricht);
+         }
+      });
 
       //Erstellung der Befehlsliste für den Bot und Aufruf der entsprechenden Methoden
       api.addMessageCreateListener(event -> {
@@ -67,6 +90,7 @@ public class MainProgram {
                case ("!roll") -> general.rollDice(event, content);
                case ("!rolldestiny") -> general.rollDestiny(event, content);
                case ("!rolldestinybetween") -> general.rollDestinyBetween(event, content);
+               case ("!macrobuilder") -> macroBuilder.sendMacroMessage(event);
                case ("!shutdown") -> general.shutdown(event);
             }
          } catch (Error e) {

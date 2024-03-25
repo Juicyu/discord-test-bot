@@ -19,8 +19,8 @@ public class General {
                 - **!MuteAll** (mutet alle Teilnehmer des Voicechannels, in dem sich der Autor des Befehls befindet)
                 - **!UnmuteAll** (unmutet alle Teilnehmer des Voicechannels, in dem sich der Autor des Befehls befindet)
                 - **!roll xdy** (x ist die Anzahl der Würfe, y die Augenzahl des Würfels)
-                - **!rollDestiny xdy (wie "!roll", nur kann jedes Ergebnis nur ein einziges Mal vorkommen)
-                - **!rollDestinyBetween xdy-z (wie !rollDestiny, mit dem Unterschied, dass ein Wertebereich angegeben werden kann!)
+                - **!rollDestiny xdy** (wie "!roll", nur kann jedes Ergebnis nur ein einziges Mal vorkommen)
+                - **!rollDestinyBetween xdy-z** (wie !rollDestiny, mit dem Unterschied, dass ein Wertebereich angegeben werden kann!)
                 - **!Play x** (Bottas tritt dem Channel bei und spielt Musik ab. An der Stelle von x muss z.B. ein Youtubelink eingefügt werden.
                         Erlaubte Formate sind:
                         YouTube
