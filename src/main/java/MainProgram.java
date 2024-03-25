@@ -92,8 +92,8 @@ public class MainProgram {
                   SlashCommandOption.create(SlashCommandOptionType.CHANNEL, "Channel", "test", true),
                   SlashCommandOption.createWithChoices(SlashCommandOptionType.STRING, "privatsphäre", "Soll die Abstimmung anonym oder öffentlich erfolgen?", true,
                      Arrays.asList(
-                        SlashCommandOptionChoice.create("öffentlich", "öffentlich")
-                        //SlashCommandOptionChoice.create("anonym", "anonym")
+                        SlashCommandOptionChoice.create("öffentlich", "öffentlich"),
+                        SlashCommandOptionChoice.create("anonym", "anonym")
                      )
                   ),
                   SlashCommandOption.createWithChoices(SlashCommandOptionType.BOOLEAN, "mehrfachauswahl", "Soll ein User mehr als eine Antwort wählen dürfen?", true,

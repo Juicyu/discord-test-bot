@@ -156,9 +156,7 @@ public class PollBuilder {
                   try {
                      Set<User> users = reaction.getUsers().get();
                      tempUserList.addAll(users);
-                  } catch (InterruptedException e) {
-                     throw new RuntimeException(e);
-                  } catch (ExecutionException e) {
+                  } catch (InterruptedException | ExecutionException e) {
                      throw new RuntimeException(e);
                   }
                });
@@ -196,14 +194,17 @@ public class PollBuilder {
       List<ArrayList<User>> userLists = new ArrayList<>();
       List<LowLevelComponent> buttons = new ArrayList<>();
       for(int i = 0; i < pollValue.getAnswereList().size(); i++) {
+         //für jeden Button soll eine neue Userliste angehangen werden.
          userLists.add(new ArrayList<User>());
          Button button = Button.primary("button" + i+1, "Option " + (i+1));
          int finalI = i;
          ButtonClickListener listener = new ButtonClickListener() {
             @Override
             public void onButtonClick(ButtonClickEvent event) {
-               boolean exists = false;
+               //Hole Benutzer, der die Interaktion ausgelöst hat
                User user = event.getInteraction().getUser();
+               //Wenn die Nutzerliste des entsprechenden Buttons den Nutzer bereits enthält, lösche ihn,
+               //ansonsten füge ihn hinzu
                if(userLists.get(finalI).contains(user)){
                   userLists.get(finalI).remove(user);
                } else {
