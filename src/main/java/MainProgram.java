@@ -45,20 +45,33 @@ public class MainProgram {
       api.addUserRoleAddListener(event -> {
          String name = event.getUser().getName();
          name = name.substring(0,1).toUpperCase() + name.substring(1);
-         if(event.getRole().getName().equals("Anwärter")){
-            String nachricht = "Du hast es geschafft, " + name + ", du hast den ersten Schritt gemeistert, um ein Teil von New Haven zu sein. \n" +
+         String nachricht = "";
+         switch(event.getRole().getName()){
+            case "Anwärter":
+               nachricht = "Du hast es geschafft, " + name + ", du hast den ersten Schritt gemeistert, um ein Teil von New Haven zu sein. \n" +
                     "\n" +
                     "Um richtig durchstarten zu können, möchten wir dich gerne an die Hand nehmen. Du findest eine Übersicht zu den wichtigsten Punkten im Kanal #faq. Lies diesen genau durch und die meisten Fragen sollten danach geklärt sein. \n" +
                     "\n" +
                     "Zudem startet heute, wie hoffentlich im Bewerbungsgespräch erwähnt, deine Probezeit bei uns. Nutze diese Zeit so gut es geht, um uns kennenzulernen und gib uns durch deine Aktivität auch die Möglichkeit, dies bei dir zu tun.\n" +
                     "\n" +
                     "In diesem Sinne nun genug der langen Worte und viel Spaß bei uns!";
-            event.getUser().sendMessage(nachricht);
-         }
-
-         if(event.getRole().getName().equals("WoW")){
-            String nachricht = "Du hast es geschafft, " + name + ", du bist nun ein Teil von New Haven :NewHaven:, Gratulation und Willkommen!";
-            event.getUser().sendMessage(nachricht);
+               event.getUser().sendMessage(nachricht);
+               break;
+            case "WoW":
+               nachricht = "Du hast es geschafft, " + name + ", du bist nun ein Teil von New Haven :heart:, Gratulation und Willkommen!";
+               event.getUser().sendMessage(nachricht);
+               break;
+            case "Botaniker":
+               nachricht = "Hallo liebe Botaniker,\n" +
+                       "hiermit wollen wir auf folgendes hinweisen:\n" +
+                       "- Zeigt nur Inhalte, die für euch an eurem Wohnort legal sind (siehe zb. CanG bei Wohnort in Deutschland)\n" +
+                       "- Keine Absprachen oder Angebote zur Weitergabe, Tausch- oder Verkauf von Cannabis, Pflanzenteilen oder Vermehrungsmaterial\n" +
+                       "- Aus Datenschutzgründen ist es zu empfehlen, Metadaten aus Bildern zu entfernen\n" +
+                       "- Sollten Bilder den Anschein erwecken, dass es sich nicht eindeutig um legale Aktivitäten handelt, raten wir jedem, auf das Hochladen solcher Bilder zu verzichten\n" +
+                       "Wir bitten euch dies im Hinterkopf zu haben, wenn ihr Bilder postet \uD83D\uDC9A\n" +
+                       "Vielen Dank euch \uD83D\uDE4F";
+               event.getUser().sendMessage(nachricht);
+               break;
          }
       });
 

@@ -134,10 +134,11 @@ public class ChannelManager {
                      .create()
                      .join();
                   if (channel.getUserLimit().isPresent()) {
-                     newChannel.updateUserLimit(channel.getUserLimit().get()).join();
+                     //Join wegzulassen erhöht die Perfomance, könnte aber zu unerwünschten sideeffects führen.
+                     newChannel.updateUserLimit(channel.getUserLimit().get())/*.join()*/;
                   }
                   //Setzt den neuen Channel unter den Channel+, der ihn erzeugt hat
-                  newChannel.updateRawPosition(event.getChannel().getRawPosition()).join();
+                  newChannel.updateRawPosition(event.getChannel().getRawPosition())/*.join()*/;
                   //Setzt die Bitrate eines Servervoice Chanels abhängig von der Tier Stufe des Servers
                   switch (event.getServer().getBoostLevel()) {
                      case NONE -> newChannel.updateBitrate(96000);
