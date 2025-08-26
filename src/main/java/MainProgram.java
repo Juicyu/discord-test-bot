@@ -15,6 +15,8 @@ import org.javacord.api.listener.interaction.SlashCommandCreateListener;
 import poll.PollBuilder;
 import poll.PollValue;
 import properties.PropertiesReader;
+import weeklyReminder.WeeklyReminder;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -276,5 +278,7 @@ public class MainProgram {
       };
 
       api.addSlashCommandCreateListener(pollCommandListener);
+
+      WeeklyReminder.startWeeklyReminder(api, "1106635906737262652");
    }
 }
