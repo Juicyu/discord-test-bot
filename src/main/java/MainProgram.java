@@ -279,6 +279,6 @@ public class MainProgram {
 
       api.addSlashCommandCreateListener(pollCommandListener);
 
-      WeeklyReminder.startWeeklyReminder(api, "1106635906737262652");
+      WeeklyReminder.startWeeklyReminder(api, "1155806295945908224");
    }
 }

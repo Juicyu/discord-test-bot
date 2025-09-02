@@ -3,10 +3,8 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -26,7 +24,9 @@ public class BotPlayer {
                 AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
                 playerManager.registerSourceManager(new YoutubeAudioSourceManager());
                 playerManager.registerSourceManager(new LocalAudioSourceManager());
-                AudioSourceManagers.registerLocalSource(playerManager);
+                //AudioSourceManagers.registerLocalSource(playerManager);
+                YoutubeAudioSourceManager ytSourceManager = new YoutubeAudioSourceManager();
+                playerManager.registerSourceManager(ytSourceManager);
                 AudioPlayer player = playerManager.createPlayer();
                 TrackScheduler trackScheduler = new TrackScheduler();
                 player.addListener(trackScheduler);
@@ -45,6 +45,7 @@ public class BotPlayer {
                 playerManager.loadItem(content, new AudioLoadResultHandler() {
                     @Override
                     public void trackLoaded(AudioTrack track) {
+                        System.out.println("Track geladen: " + track.getInfo().title);
                         player.playTrack(track);
                     }
 
@@ -57,12 +58,13 @@ public class BotPlayer {
 
                     @Override
                     public void noMatches() {
-                        // Notify the user that we've got nothing
+                        System.out.println("Keine Übereinstimmungen für die URL gefunden.");
                     }
 
                     @Override
-                    public void loadFailed(FriendlyException throwable) {
-                        // Notify the user that everything exploded
+                    public void loadFailed(FriendlyException exception) {
+                        System.out.println("Fehler beim Laden des Tracks: " + exception.getMessage());
+                        exception.printStackTrace();
                     }
                 });
             }).exceptionally(e -> {

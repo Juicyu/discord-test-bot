@@ -18,28 +18,35 @@ public class WeeklyReminder {
      * @param channelId Die ID des Discord-Channels, in dem die Nachricht gepostet werden soll
      */
     public static void startWeeklyReminder(DiscordApi api, String channelId) {
+        String nachricht = "📢 Hallo liebe Gildies," +
+                "\nder wöchentliche M+-Aufruf ist hier." + "\nBitte schreibt hier im Channel, solltet ihr noch einen +10 Key für die Weekly brauchen, damit sich fleißige Helfer für euch finden lasen können." +
+                "\nNur keine Scheu, hopp hopp :)";
+        String roleID =  "1155031891850825739";
+        String logChannelId = "1150017992697065492";
         LocalDateTime endDate = null;
         try {
-            endDate = loadOrCreateEndDate();
-            WeeklyScheduler scheduler = new WeeklyScheduler(endDate);
-            api.getTextChannelById("1150017992697065492").ifPresent(channel -> {
-                channel.sendMessage("Next run: " + ZonedDateTime.ofInstant(Instant.ofEpochMilli(System.currentTimeMillis() + scheduler.computeNextDelay()), ZoneId.systemDefault()));
-            });
-            api.getRoleById(1073675104418005012L).flatMap(role -> api.getTextChannelById(channelId)).ifPresent(channel -> {
-                channel.sendMessage("@WoW📢 Hallo liebe Gildies," +
-                        "\nder wöchentliche M+-Aufruf ist hier." + "\nBitte schreibt hier im Channel, solltet ihr noch einen +10 Key für die Weekly brauchen, damit sich fleißige Helfer für euch finden lasen können." +
-                        "\nNur keine Scheu, hopp hopp :)").exceptionally(ex -> {
-                    api.getTextChannelById("1150017992697065492").ifPresent(log -> log.sendMessage(ex.getMessage()));
-                    return null;
+            System.out.println("Test");
+            api.getRoleById(roleID).ifPresent(role -> {
+                api.getTextChannelById(channelId).ifPresent(channel -> {
+                    channel.sendMessage(role.getMentionTag() +
+                            nachricht).exceptionally(ex -> {
+                        api.getTextChannelById(logChannelId).ifPresent(log -> log.sendMessage(ex.getMessage()));
+                        return null;
+                    });
                 });
             });
+            endDate = loadOrCreateEndDate();
+            WeeklyScheduler scheduler = new WeeklyScheduler(endDate);
+            api.getTextChannelById(logChannelId).ifPresent(channel -> {
+                channel.sendMessage("Next run: " + ZonedDateTime.ofInstant(Instant.ofEpochMilli(System.currentTimeMillis() + scheduler.computeNextDelay()), ZoneId.systemDefault()));
+            });
             scheduler.schedule(() -> {
-                api.getRoleById(1073675104418005012L).flatMap(role -> api.getTextChannelById(channelId)).ifPresent(channel -> {
-                    channel.sendMessage("@WoW📢 Hallo liebe Gildies," +
-                            "\nder wöchentliche M+-Aufruf ist hier." + "\nBitte schreibt hier im Channel, solltet ihr noch einen +10 Key für die Weekly brauchen, damit sich fleißige Helfer für euch finden lasen können." +
-                            "\nNur keine Scheu, hopp hopp :)").exceptionally(ex -> {
-                        api.getTextChannelById("1150017992697065492").ifPresent(log -> log.sendMessage(ex.getMessage()));
-                        return null;
+                api.getRoleById(roleID).ifPresent(role -> {
+                    api.getTextChannelById(channelId).ifPresent(channel -> {
+                        channel.sendMessage(role.getMentionTag() + nachricht).exceptionally(ex -> {
+                            api.getTextChannelById(logChannelId).ifPresent(log -> log.sendMessage(ex.getMessage()));
+                            return null;
+                        });
                     });
                 });
             });
@@ -47,7 +54,7 @@ public class WeeklyReminder {
             e.printStackTrace();
         }
         LocalDateTime finalEndDate = endDate;
-        api.getTextChannelById("1150017992697065492").ifPresent(channel -> {
+        api.getTextChannelById(logChannelId).ifPresent(channel -> {
             assert finalEndDate != null;
             channel.sendMessage("End of transmission: " + finalEndDate);
         });
