@@ -6,7 +6,7 @@
 
     <groupId>com.discord.bot</groupId>
     <artifactId>Bottas</artifactId>
-    <version>1.8</version>
+    <version>1.10</version>
 
     <properties>
         <maven.compiler.source>16</maven.compiler.source>
@@ -48,8 +48,8 @@
                 <configuration>
                     <programs>
                         <program>
-                            <mainClass>MainProgram</mainClass>
-                            <id>Bottas</id>
+                            <mainClass>org.javacord.examplebot.Main</mainClass>
+                            <id>examplebot</id>
                         </program>
                     </programs>
                 </configuration>

@@ -25,16 +25,23 @@ public class WeeklyReminder {
             api.getTextChannelById("1150017992697065492").ifPresent(channel -> {
                 channel.sendMessage("Next run: " + ZonedDateTime.ofInstant(Instant.ofEpochMilli(System.currentTimeMillis() + scheduler.computeNextDelay()), ZoneId.systemDefault()));
             });
+            api.getRoleById(1073675104418005012L).flatMap(role -> api.getTextChannelById(channelId)).ifPresent(channel -> {
+                channel.sendMessage("@WoW📢 Hallo liebe Gildies," +
+                        "\nder wöchentliche M+-Aufruf ist hier." + "\nBitte schreibt hier im Channel, solltet ihr noch einen +10 Key für die Weekly brauchen, damit sich fleißige Helfer für euch finden lasen können." +
+                        "\nNur keine Scheu, hopp hopp :)").exceptionally(ex -> {
+                    api.getTextChannelById("1150017992697065492").ifPresent(log -> log.sendMessage(ex.getMessage()));
+                    return null;
+                });
+            });
             scheduler.schedule(() -> {
-                api.getTextChannelById(channelId)
-                        .ifPresent(channel -> {
-                            channel.sendMessage("📢 Hallo liebe Gildies," +
-                                    "\nder wöchentliche M+-Aufruf ist hier." + "\nBitte schreibt hier im Channel, solltet ihr noch einen +10 Key für die Weekly brauchen, damit sich fleißige Helfer für euch finden lasen können." +
-                                    "\nNur keine Scheu, hopp hopp :)").exceptionally(ex -> {
-                                api.getTextChannelById("1150017992697065492").ifPresent(log -> log.sendMessage(ex.getMessage()));
-                                return null;
-                            });
-                        });
+                api.getRoleById(1073675104418005012L).flatMap(role -> api.getTextChannelById(channelId)).ifPresent(channel -> {
+                    channel.sendMessage("@WoW📢 Hallo liebe Gildies," +
+                            "\nder wöchentliche M+-Aufruf ist hier." + "\nBitte schreibt hier im Channel, solltet ihr noch einen +10 Key für die Weekly brauchen, damit sich fleißige Helfer für euch finden lasen können." +
+                            "\nNur keine Scheu, hopp hopp :)").exceptionally(ex -> {
+                        api.getTextChannelById("1150017992697065492").ifPresent(log -> log.sendMessage(ex.getMessage()));
+                        return null;
+                    });
+                });
             });
         } catch (IOException e) {
             e.printStackTrace();
@@ -89,8 +96,8 @@ public class WeeklyReminder {
 
         private long computeNextDelay() {
             ZonedDateTime now = ZonedDateTime.now();
-            ZonedDateTime nextRun = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.TUESDAY))
-                    .withHour(11).withMinute(18).withSecond(0).withNano(0);
+            ZonedDateTime nextRun = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY))
+                    .withHour(10).withMinute(00).withSecond(0).withNano(0);
 
             if (now.compareTo(nextRun) >= 0) {
                 nextRun = nextRun.plusWeeks(1);
